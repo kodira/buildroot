@@ -161,7 +161,7 @@ section "Populating boot partition..."
 
 sudo mount "${LOOPDEV}p1" .mnt || exit 2
 sudo cp ${OUTPUT_PREFIX}images/rpi-firmware/* .mnt
-sudo cp ${OUTPUT_PREFIX}images/zImage .mnt
+#sudo cp ${OUTPUT_PREFIX}images/zImage .mnt
 sudo umount .mnt
 
 # fill rootfs
