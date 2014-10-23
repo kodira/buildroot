@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SKOLAR_DISPLAY_VERSION     = v1.2.0
+SKOLAR_DISPLAY_VERSION     = v1.3.0
 SKOLAR_DISPLAY_SITE        = git@github.com:kodira/skolar-display.git
 SKOLAR_DISPLAY_SITE_METHOD = git
 
