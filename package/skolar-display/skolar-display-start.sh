@@ -1,3 +1,3 @@
 #!/bin/sh
-while true; do skolar-display; done
+while true; do skolar-display --no-https; done
 
