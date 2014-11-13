@@ -1,0 +1,182 @@
+#!/bin/sh
+#
+# Create an raspi image file that can be copied onto an SD card
+# 
+# Based on a script made by Guillermo A. Amaral B. <g@maral.me>
+#
+
+IMGFILE="${1}"
+IMGFILE_SIZE="${2}"
+
+usage() {
+	echo "Usage: ${0} [IMGFILE] [IMGFILE_SIZE]"
+	echo "Where IMGFILE is a image file, for example: card.img"
+	echo "And IMGFILE_SIZE is the size in GB -- defaults to 2 GB"
+	echo
+}
+
+confirm() {
+	echo "You are about to totally decimate the following image file: ${IMGFILE}"
+	echo
+	echo "If you are sure you want to continue? (Please write \"YES\" in all caps)"
+
+	read CONTUNUE
+
+	if [ "${CONTUNUE}" != "YES" ]; then
+		echo "User didn't write \"YES\"... ABORTING!"
+		exit 1
+	fi
+}
+
+section() {
+	sync
+	echo "*****************************************************************************************"
+	echo "> ${*}"
+	echo "*****************************************************************************************"
+	sleep 1
+}
+
+# environment overrides
+
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+OUTPUT_PREFIX=""
+
+# check parameters
+
+if [ -z "${IMGFILE}" ] || [ "${IMGFILE}" = "-h" ] || [ "${IMGFILE}" = "--help" ]; then
+	usage
+	exit 0
+fi
+
+if [ -z "${IMGFILE_SIZE}" ]; then
+	IMGFILE_SIZE=2
+fi
+
+# check if node is a block device
+
+#if [ ! -b "${IMGFILE}" ]; then
+#	echo "${IMGFILE} is not a block device!"
+#	exit 1
+#fi
+
+# root privilege check
+
+#USERID=`id -u`
+#if [ ${USERID} -ne 0 ]; then
+#	echo "${0} requires root privileges in order to work."
+#	exit 0
+#fi
+
+# dependencies
+
+FDISK=`which fdisk`
+MKFS_EXT4=`which mkfs.ext4`
+MKFS_VFAT=`which mkfs.vfat`
+TAR=`which tar`
+
+if [ -z "${FDISK}" ] || [ -z "${MKFS_EXT4}" ] || [ -z "${MKFS_VFAT}" ] || [ -z "${TAR}" ]; then
+	echo "Missing dependencies:\n"
+	echo "FDISK=${FDISK}"
+	echo "MKFS_EXT4=${MKFS_EXT4}"
+	echo "MKFS_VFAT=${MKFS_VFAT}"
+	echo "TAR=${TAR}"
+	exit 1
+fi
+
+# sanity check
+
+if [ ! -d "images/rpi-firmware" ] || [ ! -f "images/rootfs.tar" ]; then
+	if [ -d "output/images/rpi-firmware" ] && [ -f "output/images/rootfs.tar" ]; then
+		OUTPUT_PREFIX="output/"
+	else
+		echo "Didn't find rpi-firmware and/or rootfs.tar! ABORT."
+		exit 1
+	fi
+fi
+
+# warn user
+
+confirm
+
+# create image file
+
+section "Creating image file..."
+
+IMGFILE_SIZE_KB=`expr ${IMGFILE_SIZE} \\* 1000000`
+echo "Image file will be ${IMGFILE_SIZE_KB} kB in size"
+dd if=/dev/zero of=${IMGFILE} bs=1024 count=${IMGFILE_SIZE_KB}
+
+# partition image
+
+section "Partitioning image file..."
+
+${FDISK} ${IMGFILE} <<END
+o
+n
+p
+1
+
++32M
+n
+p
+2
+
+
+t
+1
+e
+a
+1
+w
+END
+
+sleep 1
+
+# get root rights
+
+section "Executing sudo to mount partitions and create file systems..."
+
+sudo echo "Let's go!"
+
+# create loopback devices
+
+section "Create loopback devies..."
+
+LOOPDEV=`sudo losetup --partscan --find --show ${IMGFILE}`
+
+# format partitions
+
+section "Formatting partitions..."
+
+sudo ${MKFS_VFAT} -F 16 -n BOOT -I "${LOOPDEV}p1" || exit 1
+sudo ${MKFS_EXT4} -F -q -L rootfs  "${LOOPDEV}p2" || exit 1
+
+# prepare to fill partitions
+
+mkdir .mnt
+
+# fill boot
+
+section "Populating boot partition..."
+
+sudo mount "${LOOPDEV}p1" .mnt || exit 2
+sudo cp ${OUTPUT_PREFIX}images/rpi-firmware/* .mnt
+#sudo cp ${OUTPUT_PREFIX}images/zImage .mnt
+sudo umount .mnt
+
+# fill rootfs
+
+section "Populating rootfs partition..."
+
+sudo mount "${LOOPDEV}p2" .mnt || exit 2
+sudo ${TAR} -xpsf ${OUTPUT_PREFIX}images/rootfs.tar -C .mnt
+sudo umount .mnt
+
+# clean up
+
+rmdir .mnt
+sudo losetup -d /dev/loop0
+
+section "Finished!"
+
+exit 0
