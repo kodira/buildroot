@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BINARY=skolar-display
+BINARY=skolardisplay
 # the return code that should terminate the execution of the display application
 TERMINATE_EXIT_CODE=42
 while true;
