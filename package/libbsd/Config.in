@@ -1,8 +1,13 @@
+config BR2_PACKAGE_LIBBSD_ARCH_SUPPORTS
+	bool
+	default y
+	# libbsd does not support those architectures (see src/local-elf.h)
+	depends on !BR2_microblaze
+	depends on !BR2_arc
+
 config BR2_PACKAGE_LIBBSD
 	bool "libbsd"
-	# libbsd requires a.out.h, which is only available for those
-	# architectures: arm, m68k, x86 (and alpha, but we don't care.)
-	depends on ( BR2_i386 || BR2_x86_64 )
+	depends on BR2_PACKAGE_LIBBSD_ARCH_SUPPORTS
 	depends on BR2_TOOLCHAIN_HAS_THREADS
 	depends on BR2_TOOLCHAIN_USES_GLIBC
 	help
@@ -14,6 +19,6 @@ config BR2_PACKAGE_LIBBSD
 
 	  http://libbsd.freedesktop.org/
 
-comment "libbsd needs an (e)glibc toolchain w/ threads"
-	depends on ( BR2_i386 || BR2_x86_64 )
+comment "libbsd needs a glibc toolchain w/ threads"
+	depends on BR2_PACKAGE_LIBBSD_ARCH_SUPPORTS
 	depends on !BR2_TOOLCHAIN_HAS_THREADS || !BR2_TOOLCHAIN_USES_GLIBC

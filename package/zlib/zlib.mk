@@ -4,14 +4,17 @@
 #
 ################################################################################
 
-ZLIB_VERSION = 1.2.8
+ZLIB_VERSION = 1.2.11
 ZLIB_SOURCE = zlib-$(ZLIB_VERSION).tar.xz
-ZLIB_SITE = http://downloads.sourceforge.net/project/libpng/zlib/$(ZLIB_VERSION)
-ZLIB_LICENSE = zlib license
+ZLIB_SITE = http://www.zlib.net
+ZLIB_LICENSE = Zlib
 ZLIB_LICENSE_FILES = README
 ZLIB_INSTALL_STAGING = YES
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+# It is not possible to build only a shared version of zlib, so we build both
+# shared and static, unless we only want the static libs, and we eventually
+# selectively remove what we do not want
+ifeq ($(BR2_STATIC_LIBS),y)
 ZLIB_PIC =
 ZLIB_SHARED = --static
 else
@@ -35,29 +38,39 @@ define HOST_ZLIB_CONFIGURE_CMDS
 		$(HOST_CONFIGURE_ARGS) \
 		$(HOST_CONFIGURE_OPTS) \
 		./configure \
-		--prefix="$(HOST_DIR)/usr" \
+		--prefix="$(HOST_DIR)" \
 		--sysconfdir="$(HOST_DIR)/etc" \
 	)
 endef
 
 define ZLIB_BUILD_CMDS
-	$(MAKE1) -C $(@D)
+	$(TARGET_MAKE_ENV) $(MAKE1) -C $(@D)
 endef
 
 define HOST_ZLIB_BUILD_CMDS
-	$(MAKE1) -C $(@D)
+	$(HOST_MAKE_ENV) $(MAKE1) -C $(@D)
 endef
 
 define ZLIB_INSTALL_STAGING_CMDS
-	$(MAKE1) -C $(@D) DESTDIR=$(STAGING_DIR) LDCONFIG=true install
+	$(TARGET_MAKE_ENV) $(MAKE1) -C $(@D) DESTDIR=$(STAGING_DIR) LDCONFIG=true install
 endef
 
 define ZLIB_INSTALL_TARGET_CMDS
-	$(MAKE1) -C $(@D) DESTDIR=$(TARGET_DIR) LDCONFIG=true install
+	$(TARGET_MAKE_ENV) $(MAKE1) -C $(@D) DESTDIR=$(TARGET_DIR) LDCONFIG=true install
 endef
 
+# We don't care removing the .a from target, since it not used at link
+# time to build other packages, and it is anyway removed later before
+# assembling the filesystem images anyway.
+ifeq ($(BR2_SHARED_LIBS),y)
+define ZLIB_RM_STATIC_STAGING
+	rm -f $(STAGING_DIR)/usr/lib/libz.a
+endef
+ZLIB_POST_INSTALL_STAGING_HOOKS += ZLIB_RM_STATIC_STAGING
+endif
+
 define HOST_ZLIB_INSTALL_CMDS
-	$(MAKE1) -C $(@D) LDCONFIG=true install
+	$(HOST_MAKE_ENV) $(MAKE1) -C $(@D) LDCONFIG=true install
 endef
 
 $(eval $(generic-package))

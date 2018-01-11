@@ -1,6 +1,7 @@
 config BR2_PACKAGE_ZSH
 	bool "zsh"
 	depends on BR2_USE_MMU # fork()
+	depends on BR2_PACKAGE_BUSYBOX_SHOW_OTHERS
 	select BR2_PACKAGE_NCURSES
 	help
 	  zsh is a shell designed for interactive use, although it is also
@@ -8,4 +9,4 @@ config BR2_PACKAGE_ZSH
 	  ksh, and tcsh were incorporated into zsh; many original features
 	  were added.
 
-	  http://zsh.sourceforge.net/
+	  http://www.zsh.org/

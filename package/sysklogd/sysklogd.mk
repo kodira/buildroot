@@ -4,11 +4,9 @@
 #
 ################################################################################
 
-SYSKLOGD_VERSION = 1.5
-SYSKLOGD_SOURCE = sysklogd_$(SYSKLOGD_VERSION).orig.tar.gz
-SYSKLOGD_PATCH = sysklogd_$(SYSKLOGD_VERSION)-6.diff.gz
-SYSKLOGD_SITE = $(BR2_DEBIAN_MIRROR)/debian/pool/main/s/sysklogd
-SYSKLOGD_LICENSE = GPLv2+
+SYSKLOGD_VERSION = 1.5.1
+SYSKLOGD_SITE = http://www.infodrom.org/projects/sysklogd/download
+SYSKLOGD_LICENSE = GPL-2.0+
 SYSKLOGD_LICENSE_FILES = COPYING
 
 # Override BusyBox implementations if BusyBox is enabled.
@@ -16,25 +14,34 @@ ifeq ($(BR2_PACKAGE_BUSYBOX),y)
 SYSKLOGD_DEPENDENCIES = busybox
 endif
 
-define SYSKLOGD_DEBIAN_PATCHES
-	if [ -d $(@D)/debian/patches ]; then \
-		support/scripts/apply-patches.sh $(@D) $(@D)/debian/patches \*.patch; \
-	fi
-endef
-
-SYSKLOGD_POST_PATCH_HOOKS = SYSKLOGD_DEBIAN_PATCHES
-
+# Override SKFLAGS which is used as CFLAGS.
 define SYSKLOGD_BUILD_CMDS
-	$(MAKE) $(TARGET_CONFIGURE_OPTS) -C $(@D)
+	$(MAKE) $(TARGET_CONFIGURE_OPTS) SKFLAGS="$(TARGET_CFLAGS) -DSYSV" \
+		-C $(@D)
 endef
 
 define SYSKLOGD_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0500 $(@D)/syslogd $(TARGET_DIR)/sbin/syslogd
 	$(INSTALL) -D -m 0500 $(@D)/klogd $(TARGET_DIR)/sbin/klogd
-	if [ ! -f $(TARGET_DIR)/etc/syslog.conf ]; then \
-		$(INSTALL) -D -m 0644 package/sysklogd/syslog.conf \
-			$(TARGET_DIR)/etc/syslog.conf; \
-	fi
+	$(INSTALL) -D -m 0644 package/sysklogd/syslog.conf \
+		$(TARGET_DIR)/etc/syslog.conf
+endef
+
+define SYSKLOGD_INSTALL_INIT_SYSV
+	$(INSTALL) -m 755 -D package/sysklogd/S01logging \
+		$(TARGET_DIR)/etc/init.d/S01logging
+endef
+
+define SYSKLOGD_INSTALL_INIT_SYSTEMD
+	$(INSTALL) -D -m 644 $(SYSKLOGD_PKGDIR)/syslogd.service \
+		$(TARGET_DIR)/usr/lib/systemd/system/syslogd.service
+	$(INSTALL) -D -m 644 $(SYSKLOGD_PKGDIR)/klogd.service \
+		$(TARGET_DIR)/usr/lib/systemd/system/klogd.service
+	mkdir -p $(TARGET_DIR)/etc/systemd/system/multi-user.target.wants
+	ln -sf ../../../../usr/lib/systemd/system/syslogd.service \
+		$(TARGET_DIR)/etc/systemd/system/multi-user.target.wants/syslogd.service
+	ln -sf ../../../usr/lib/systemd/system/syslogd.service \
+		$(TARGET_DIR)/etc/systemd/system/syslog.service
 endef
 
 $(eval $(generic-package))

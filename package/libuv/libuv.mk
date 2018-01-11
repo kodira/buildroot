@@ -4,12 +4,12 @@
 #
 ################################################################################
 
-LIBUV_VERSION = v0.11.26
-LIBUV_SITE = $(call github,joyent,libuv,$(LIBUV_VERSION))
+LIBUV_VERSION = v1.16.0
+LIBUV_SITE = $(call github,libuv,libuv,$(LIBUV_VERSION))
 LIBUV_DEPENDENCIES = host-pkgconf
 LIBUV_INSTALL_STAGING = YES
 LIBUV_AUTORECONF = YES
-LIBUV_LICENSE = BSD-2c, BSD-3c, ISC, MIT
+LIBUV_LICENSE = BSD-2-Clause, BSD-3-Clause, ISC, MIT
 LIBUV_LICENSE_FILES = LICENSE
 
 # Upstream needs tests to be run sequentially. This is the default in
@@ -20,7 +20,7 @@ LIBUV_LICENSE_FILES = LICENSE
 # 1.14, so we need it.
 define LIBUV_FIXUP_AUTOGEN
 	echo "m4_define([UV_EXTRA_AUTOMAKE_FLAGS], [serial-tests])" \
-	        >$(@D)/m4/libuv-extra-automake-flags.m4
+		>$(@D)/m4/libuv-extra-automake-flags.m4
 endef
 LIBUV_POST_PATCH_HOOKS += LIBUV_FIXUP_AUTOGEN
 
