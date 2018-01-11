@@ -4,17 +4,14 @@
 #
 ################################################################################
 
-LIBCONFUSE_VERSION = V2_7
-LIBCONFUSE_SITE = $(call github,martinh,libconfuse,$(LIBCONFUSE_VERSION))
+LIBCONFUSE_VERSION = 3.2
+LIBCONFUSE_SOURCE = confuse-$(LIBCONFUSE_VERSION).tar.xz
+LIBCONFUSE_SITE = https://github.com/martinh/libconfuse/releases/download/v$(LIBCONFUSE_VERSION)
 LIBCONFUSE_INSTALL_STAGING = YES
-LIBCONFUSE_CONF_OPT = --disable-rpath
-LIBCONFUSE_DEPENDENCIES = host-flex
+LIBCONFUSE_CONF_OPTS = --disable-rpath
 LIBCONFUSE_LICENSE = ISC
-LIBCONFUSE_LICENSE_FILES = src/confuse.c
-
-# Fresh from the repository, no configure et al.
-LIBCONFUSE_AUTORECONF = YES
-LIBCONFUSE_GETTEXTIZE = YES
+LIBCONFUSE_LICENSE_FILES = LICENSE
+LIBCONFUSE_DEPENDENCIES = $(TARGET_NLS_DEPENDENCIES)
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

@@ -1,2 +1,4 @@
 # From https://www.kernel.org/pub/software/network/ethtool/sha256sums.asc
-sha256	d6e0dd3fa904c3ad87487c66a4a8fde1ebc4194979ca5755df4b2efb247ca286	ethtool-3.16.tar.xz
+sha256	b7c1a380007d30eaf261a63b3cfc000f9d93f9eb7626dcd48b5d2a733af99cba	ethtool-4.13.tar.xz
+# Locally calculated
+sha256	8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643	COPYING

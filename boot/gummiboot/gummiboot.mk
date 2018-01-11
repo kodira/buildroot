@@ -4,9 +4,10 @@
 #
 ################################################################################
 
-GUMMIBOOT_SITE = git://anongit.freedesktop.org/gummiboot
+GUMMIBOOT_SITE = http://cgit.freedesktop.org/gummiboot
+GUMMIBOOT_SITE_METHOD = git
 GUMMIBOOT_VERSION = 43
-GUMMIBOOT_LICENSE = LGPLv2.1+
+GUMMIBOOT_LICENSE = LGPL-2.1+
 GUMMIBOOT_LICENSE_FILES = LICENSE
 
 # The git archive does not have the autoconf/automake stuff generated.
@@ -21,7 +22,7 @@ else ifeq ($(BR2_x86_64),y)
 GUMMIBOOT_IMGARCH = x64
 endif
 
-GUMMIBOOT_CONF_OPT = \
+GUMMIBOOT_CONF_OPTS = \
 	--host=$(BR2_ARCH) \
 	--with-efi-libdir=$(STAGING_DIR)/usr/lib \
 	--with-efi-ldsdir=$(STAGING_DIR)/usr/lib \

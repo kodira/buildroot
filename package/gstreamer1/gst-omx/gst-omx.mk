@@ -4,15 +4,15 @@
 #
 ################################################################################
 
-GST_OMX_VERSION = 1.2.0
+GST_OMX_VERSION = 1.12.3
 GST_OMX_SOURCE = gst-omx-$(GST_OMX_VERSION).tar.xz
-GST_OMX_SITE = http://gstreamer.freedesktop.org/src/gst-omx
+GST_OMX_SITE = https://gstreamer.freedesktop.org/src/gst-omx
 
-GST_OMX_LICENSE = LGPLv2.1
+GST_OMX_LICENSE = LGPL-2.1
 GST_OMX_LICENSE_FILES = COPYING
 
 ifeq ($(BR2_PACKAGE_RPI_USERLAND),y)
-GST_OMX_CONF_OPT = \
+GST_OMX_CONF_OPTS = \
 	--with-omx-target=rpi
 GST_OMX_CONF_ENV = \
 	CFLAGS="$(TARGET_CFLAGS) \
@@ -22,7 +22,7 @@ GST_OMX_CONF_ENV = \
 endif
 
 ifeq ($(BR2_PACKAGE_BELLAGIO),y)
-GST_OMX_CONF_OPT = \
+GST_OMX_CONF_OPTS = \
 	--with-omx-target=bellagio
 GST_OMX_CONF_ENV = \
 	CFLAGS="$(TARGET_CFLAGS) \
