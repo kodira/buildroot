@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-KVM_UNIT_TESTS_VERSION = 95062c20790d82713bfa7475b61a4adef3f3645a
+KVM_UNIT_TESTS_VERSION = kvm-unit-tests-20171020
 KVM_UNIT_TESTS_SITE = $(BR2_KERNEL_MIRROR)/scm/virt/kvm/kvm-unit-tests.git
 KVM_UNIT_TESTS_SITE_METHOD = git
 KVM_UNIT_TESTS_LICENSE = LGPL-2.0
@@ -28,7 +28,7 @@ endif
 
 KVM_UNIT_TESTS_CONF_OPTS =\
 	--arch="$(KVM_UNIT_TESTS_ARCH)" \
-	--processor="$(call qstrip,$(BR2_GCC_TARGET_CPU))" \
+	--processor="$(GCC_TARGET_CPU)" \
 	--endian="$(KVM_UNIT_TESTS_ENDIAN)"
 
 # For all architectures but x86-64, we use the target
