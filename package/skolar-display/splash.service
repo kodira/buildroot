@@ -1,0 +1,11 @@
+[Unit]
+Description=Skolar Display Splash
+DefaultDependencies=no
+
+[Service]
+type=simple
+ExecStart=fbv -d 1 /usr/share/pixmaps/skolar-display-splash.png > /dev/null 2>&1
+
+[Install]
+WantedBy=sysinit.target
+
