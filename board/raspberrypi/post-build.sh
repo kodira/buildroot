@@ -9,3 +9,8 @@ if [ -e ${TARGET_DIR}/etc/inittab ]; then
 	sed -i '/GENERIC_SERIAL/a\
 tty1::respawn:/sbin/getty -L  tty1 0 vt100 # HDMI console' ${TARGET_DIR}/etc/inittab
 fi
+
+# Copy config (Skolar Display)
+cp board/raspberrypi/config.txt output/images/rpi-firmware
+cp board/raspberrypi/cmdline.txt output/images/rpi-firmware
+

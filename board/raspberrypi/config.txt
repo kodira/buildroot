@@ -1,0 +1,27 @@
+# Skolar Display Raspi Config
+
+kernel=zImage
+
+# Turbo
+#arm_freq=1500
+#sdram_freq=500
+#gpu_freq=500
+#over_voltage=2
+#force_turbo=1
+
+# Memory split
+gpu_mem_512=128
+gpu_mem_1024=128
+
+# If set to 1, avoids the rainbow splash screen on boot
+disable_splash=1
+
+# Use HDMI mode even if no HDMI monitor is detected
+hdmi_force_hotplug=1
+
+# Set to 1 to disable overscan. 
+disable_overscan=1                                                                              
+
+# Configure the signal strength of the HDMI interface. Default is 0. Try 4 if you have interfere
+config_hdmi_boost=5
+

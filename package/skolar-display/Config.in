@@ -1,0 +1,7 @@
+config BR2_PACKAGE_SKOLAR_DISPLAY
+		bool "skolar-display"
+		help
+	  Super display software for skools :)
+	  
+	  http://skolar.de
+

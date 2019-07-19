@@ -1,0 +1,10 @@
+[Unit]
+Description=Skolar Display
+
+[Service]
+ExecStart=/usr/bin/skolar-display-start.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
